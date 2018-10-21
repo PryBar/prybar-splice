@@ -1,0 +1,79 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- Copyright (c) 2017 RedEngine Ltd, http://www.redengine.co.nz. All rights reserved. -->
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+  <parent>
+    <groupId>net.stickycode.parent</groupId>
+    <artifactId>sticky-parent-jar8</artifactId>
+    <version>3.1</version>
+  </parent>
+  <modelVersion>4.0.0</modelVersion>
+
+  <groupId>net.stickycode.prybar</groupId>
+  <artifactId>prybar-splice</artifactId>
+  <version>1.1-SNAPSHOT</version>
+  <packaging>jar</packaging>
+
+  <name>${project.artifactId}-1</name>
+  <description></description>
+  <inceptionYear>2017</inceptionYear>
+  <url>https://github.com/StickySource/prybar</url>
+
+  <scm>
+    <developerConnection>${git.url}</developerConnection>
+    <tag>HEAD</tag>
+  </scm>
+
+  <dependencies>
+    <dependency>
+      <groupId>net.stickycode.composite</groupId>
+      <artifactId>sticky-composite-unittest</artifactId>
+      <version>[3,4)</version>
+      <scope>test</scope>
+    </dependency>
+
+    <dependency>
+      <groupId>net.stickycode.composite</groupId>
+      <artifactId>sticky-composite-logging-deploy</artifactId>
+      <version>[3,4)</version>
+      <scope>test</scope>
+    </dependency>
+
+    <dependency>
+      <groupId>net.stickycode.prybar</groupId>
+      <artifactId>prybar-pivot</artifactId>
+      <version>1.1-SNAPSHOT</version>
+    </dependency>
+    <dependency>
+      <groupId>net.stickycode.composite</groupId>
+      <artifactId>sticky-composite-logging-api</artifactId>
+      <version>[3,4)</version>
+    </dependency>
+
+    <dependency>
+      <groupId>net.stickycode.stereotype</groupId>
+      <artifactId>sticky-stereotype-component</artifactId>
+      <version>(3,4]</version>
+    </dependency>
+    <dependency>
+      <groupId>org.openjdk.jmh</groupId>
+      <artifactId>jmh-core</artifactId>
+      <version>1.19</version>
+    </dependency>
+    <dependency>
+      <groupId>org.openjdk.jmh</groupId>
+      <artifactId>jmh-generator-annprocess</artifactId>
+      <version>1.19</version>
+    </dependency>
+    <dependency>
+      <groupId>org.ow2.asm</groupId>
+      <artifactId>asm</artifactId>
+      <version>6.2.1</version>
+    </dependency>
+    <dependency>
+      <groupId>org.ow2.asm</groupId>
+      <artifactId>asm-util</artifactId>
+      <version>6.2.1</version>
+    </dependency>
+  </dependencies>
+
+</project>
