@@ -40,7 +40,7 @@
 
     <dependency>
       <groupId>net.stickycode.prybar</groupId>
-      <artifactId>prybar-pivot</artifactId>
+      <artifactId>prybar-api</artifactId>
       <version>1.1-SNAPSHOT</version>
     </dependency>
     <dependency>
