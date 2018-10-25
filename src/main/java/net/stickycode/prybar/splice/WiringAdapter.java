@@ -27,6 +27,8 @@ public class WiringAdapter
 
   private PrybarComponentDefinition component;
 
+  private boolean defaultConstructorFound = false;
+
   public WiringAdapter(ClassWriter writer, PrybarComponentDefinition component) {
     super(Opcodes.ASM6, writer);
     this.component = component;
@@ -40,6 +42,10 @@ public class WiringAdapter
   @Override
   public MethodVisitor visitMethod(int access, String name, String descriptor, String signature, String[] exceptions) {
     MethodVisitor visitMethod = super.visitMethod(access, name, descriptor, signature, exceptions);
+    if ("<init>".equals(name))
+      if (descriptor == null)
+        defaultConstructorFound = true;
+
     return visitMethod;
   }
 
@@ -56,9 +62,14 @@ public class WiringAdapter
 
   @Override
   public void visitEnd() {
-
+    if (!defaultConstructorFound)
+      visitDefaultConstructor();
     visitWireMethod();
     super.visitEnd();
+  }
+
+  private void visitDefaultConstructor() {
+
   }
 
   private void visitWireMethod() {
