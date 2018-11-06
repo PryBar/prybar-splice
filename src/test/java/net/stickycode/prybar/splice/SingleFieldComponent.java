@@ -5,13 +5,9 @@ import javax.inject.Inject;
 import net.stickycode.stereotype.StickyComponent;
 
 @StickyComponent
-public class TestComponent {
+public class SingleFieldComponent {
 
   @Inject
-  private OtherComponent component;
-
-  public OtherComponent getComponent() {
-    return component;
-  }
+  private PlaceHolder component;
 
 }

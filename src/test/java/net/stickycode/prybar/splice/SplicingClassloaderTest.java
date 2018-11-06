@@ -36,8 +36,8 @@ public class SplicingClassloaderTest {
   public void classloader()
       throws ClassNotFoundException, NoSuchMethodException, SecurityException, InstantiationException, IllegalAccessException,
       IllegalArgumentException, InvocationTargetException {
-    ClassLoader wired = new SplicingClassloader(getClass().getClassLoader(), registry(TestComponent.class.getName()));
-    Class<?> loaded = wired.loadClass(TestComponent.class.getName());
+    ClassLoader wired = new SplicingClassloader(getClass().getClassLoader(), registry(SingleFieldComponent.class.getName()));
+    Class<?> loaded = wired.loadClass(SingleFieldComponent.class.getName());
     loaded.getDeclaredMethod("wire", new Class[] { PrybarRuntime.class });
     PrybarComponent instance = (PrybarComponent) loaded.getDeclaredConstructor(null).newInstance(null);
     instance.wire(null);

@@ -75,21 +75,23 @@ public class WiringAdapter
   private void visitWireMethod() {
     MethodVisitor mv = visitMethod(ACC_PUBLIC, "wire", wireSignature(), null, null);
     mv.visitCode();
-    Label l0 = new Label();
-    mv.visitLabel(l0);
-    mv.visitLineNumber(12, l0);
+    Label label0 = new Label();
+    mv.visitLabel(label0);
+    mv.visitLineNumber(19, label0);
     for (PrybarComponentDependency d : component.getComponentWiring())
       injectDependency(mv, d);
-    Label l2 = new Label();
-    mv.visitLabel(l2);
-    mv.visitLineNumber(14, l2);
+
+    Label label1 = new Label();
+    mv.visitLabel(label1);
+    mv.visitLineNumber(20, label1);
     mv.visitInsn(RETURN);
-    Label l3 = new Label();
-    mv.visitLabel(l3);
-    mv.visitLocalVariable("this", component.getTypeReference(), null, l0, l3, 0);// "Lnet/stickycode/prybar/pivot/LeafComponent2;"
-    mv.visitLocalVariable("prybar", "Lnet/stickycode/prybar/pivot/PrybarRuntime;", null, l0, l3, 1);
-    mv.visitMaxs(0, 0);
+    Label label2 = new Label();
+    mv.visitLabel(label2);
+    mv.visitLocalVariable("this", component.getTypeReference(), null, label0, label2, 0);
+    mv.visitLocalVariable("prybar", "Lnet/stickycode/prybar/pivot/PrybarRuntime;", null, label0, label2, 1);
+    mv.visitMaxs(7, 2);
     mv.visitEnd();
+
   }
 
   private void injectDependency(MethodVisitor mv, PrybarComponentDependency d) {
@@ -98,16 +100,14 @@ public class WiringAdapter
     mv.visitTypeInsn(NEW, "net/stickycode/prybar/pivot/PrybarComponentLookup");
     mv.visitInsn(DUP);
     mv.visitVarInsn(ALOAD, 0);
-    mv.visitLdcInsn(Type.getType(d.getFieldTypeReference()));// "Lnet/stickycode/prybar/pivot/RootComponent;"
-    mv.visitLdcInsn("root");
+    mv.visitLdcInsn(Type.getType(d.getFieldTypeReference()));
+    mv.visitLdcInsn(d.getFieldName());
     mv.visitMethodInsn(INVOKESPECIAL, "net/stickycode/prybar/pivot/PrybarComponentLookup", "<init>",
       "(Lnet/stickycode/prybar/pivot/PrybarComponent;Ljava/lang/Class;Ljava/lang/String;)V", false);
     mv.visitMethodInsn(INVOKEINTERFACE, "net/stickycode/prybar/pivot/PrybarRuntime", "require",
       "(Lnet/stickycode/prybar/pivot/PrybarComponentLookup;)Ljava/lang/Object;", true);
-    mv.visitTypeInsn(CHECKCAST, d.getFieldTypePath());// "net/stickycode/prybar/pivot/RootComponent"
-    mv.visitFieldInsn(PUTFIELD, component.getTypePath(), // "net/stickycode/prybar/pivot/LeafComponent2"
-      d.getFieldName(), // "root",
-      d.getFieldTypeReference());// "Lnet/stickycode/prybar/pivot/RootComponent;");
+    mv.visitTypeInsn(CHECKCAST, d.getFieldTypePath());
+    mv.visitFieldInsn(PUTFIELD, component.getTypePath(), d.getFieldName(), d.getFieldTypeReference());
 
   }
 
