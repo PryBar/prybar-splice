@@ -17,8 +17,13 @@ import org.objectweb.asm.util.TraceClassVisitor;
 
 import net.stickycode.prybar.discovery.PrybarComponentDefinition;
 import net.stickycode.prybar.discovery.PrybarComponentDependency;
+import net.stickycode.prybar.splice.example.ConfiguredComponent;
+import net.stickycode.prybar.splice.example.ConfiguredExample;
 import net.stickycode.prybar.splice.example.ManyFieldComponent;
 import net.stickycode.prybar.splice.example.ManyFieldExample;
+import net.stickycode.prybar.splice.example.PlaceHolder;
+import net.stickycode.prybar.splice.example.SingleFieldComponent;
+import net.stickycode.prybar.splice.example.SingleFieldExample;
 
 public class WiringAdaptorTest {
 
@@ -27,7 +32,7 @@ public class WiringAdaptorTest {
     PrybarComponentDefinition definition = new PrybarComponentDefinition(SingleFieldComponent.class.getName());
     definition.getComponentWiring().add(new PrybarComponentDependency()
       .withFieldName("component")
-      .withFieldType("net/stickycode/prybar/splice/PlaceHolder")
+      .withFieldType("net/stickycode/prybar/splice/example/PlaceHolder")
       .withTarget(PlaceHolder.class));
     check(definition, SingleFieldExample.class);
   }
@@ -38,15 +43,15 @@ public class WiringAdaptorTest {
     definition.getComponentWiring()
       .add(new PrybarComponentDependency()
         .withFieldName("component")
-        .withFieldType("net/stickycode/prybar/splice/PlaceHolder")
+        .withFieldType("net/stickycode/prybar/splice/example/PlaceHolder")
         .withTarget(PlaceHolder.class))
       .add(new PrybarComponentDependency()
         .withFieldName("componentTwo")
-        .withFieldType("net/stickycode/prybar/splice/PlaceHolder")
+        .withFieldType("net/stickycode/prybar/splice/example/PlaceHolder")
         .withTarget(PlaceHolder.class));
     check(definition, ManyFieldExample.class);
   }
-
+  
   private void check(PrybarComponentDefinition definition, Class<?> example) throws IOException {
     String targetAsm = spliceClass(definition).replaceAll(".*LineNumber.*\n",        "");
     String exampleAsm = asmifierClass(example).replaceAll("Example", "Component").replaceAll(".*LineNumber.*\n",        "");

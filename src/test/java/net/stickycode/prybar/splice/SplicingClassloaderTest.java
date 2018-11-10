@@ -8,6 +8,7 @@ import net.stickycode.prybar.discovery.PrybarComponentDefinition;
 import net.stickycode.prybar.discovery.PrybarDefinitionRegistry;
 import net.stickycode.prybar.pivot.PrybarComponent;
 import net.stickycode.prybar.pivot.PrybarRuntime;
+import net.stickycode.prybar.splice.example.SingleFieldComponent;
 
 public class SplicingClassloaderTest {
 

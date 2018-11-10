@@ -1,4 +1,4 @@
-package net.stickycode.prybar.splice;
+package net.stickycode.prybar.splice.example;
 
 import javax.inject.Inject;
 
