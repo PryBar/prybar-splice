@@ -4,6 +4,7 @@ import static org.objectweb.asm.Opcodes.ACC_PUBLIC;
 import static org.objectweb.asm.Opcodes.ALOAD;
 import static org.objectweb.asm.Opcodes.CHECKCAST;
 import static org.objectweb.asm.Opcodes.DUP;
+import static org.objectweb.asm.Opcodes.GETFIELD;
 import static org.objectweb.asm.Opcodes.INVOKEINTERFACE;
 import static org.objectweb.asm.Opcodes.INVOKESPECIAL;
 import static org.objectweb.asm.Opcodes.NEW;
@@ -21,6 +22,7 @@ import org.objectweb.asm.Type;
 
 import net.stickycode.prybar.discovery.PrybarComponentDefinition;
 import net.stickycode.prybar.discovery.PrybarComponentDependency;
+import net.stickycode.prybar.discovery.PrybarConfiguredField;
 import net.stickycode.prybar.pivot.PrybarComponent;
 import net.stickycode.prybar.pivot.PrybarRuntime;
 
@@ -68,8 +70,53 @@ public class WiringAdapter
   public void visitEnd() {
     if (!defaultConstructorFound)
       visitDefaultConstructor();
-    visitWireMethod();
+
+    if (component.hasWiring())
+      visitWireMethod();
+
+    if (component.hasConfiguration())
+      visitConfiguredMethod();
+
     super.visitEnd();
+  }
+
+  private void visitConfiguredMethod() {
+    MethodVisitor mv = visitMethod(ACC_PUBLIC, "configure", prybarRuntimeSignature(), null, null);
+    mv.visitCode();
+
+    Label labelStart = new Label();
+    mv.visitLabel(labelStart);
+    mv.visitLineNumber(0, labelStart);
+
+    for (PrybarConfiguredField f : component.getConfiguration())
+      configureField(mv, f);
+
+    mv.visitInsn(RETURN);
+    Label labelEnd = new Label();
+    mv.visitLabel(labelEnd);
+    mv.visitLocalVariable("this", component.getTypeReference(), null, labelStart, labelEnd, 0);
+    mv.visitLocalVariable("prybar", "Lnet/stickycode/prybar/pivot/PrybarRuntime;", null, labelStart, labelEnd, 1);
+    mv.visitMaxs(7, 2);
+    mv.visitEnd();
+  }
+
+  private void configureField(MethodVisitor mv, PrybarConfiguredField f) {
+    mv.visitVarInsn(ALOAD, 0);
+    mv.visitVarInsn(ALOAD, 1);
+    mv.visitVarInsn(ALOAD, 0);
+    mv.visitLdcInsn(Type.getType(f.getFieldTypeReference()));
+    mv.visitLdcInsn(f.getFieldName());
+    mv.visitVarInsn(ALOAD, 0);
+    mv.visitFieldInsn(GETFIELD, component.getTypePath(), f.getFieldName(), "Ljava/lang/String;");
+    mv.visitMethodInsn(INVOKEINTERFACE, "net/stickycode/prybar/pivot/PrybarRuntime", "configuration",
+      "(Lnet/stickycode/prybar/pivot/PrybarComponent;Ljava/lang/Class;Ljava/lang/String;" + f.getFieldTypeReference() + ")Ljava/lang/Object;",
+      true);
+    mv.visitTypeInsn(CHECKCAST, f.getFieldType());
+    mv.visitFieldInsn(PUTFIELD, component.getTypePath(), f.getFieldName(), f.getFieldTypeReference());
+
+    Label label1 = new Label();
+    mv.visitLabel(label1);
+    mv.visitLineNumber(0, label1);
   }
 
   private void visitDefaultConstructor() {
@@ -77,7 +124,7 @@ public class WiringAdapter
   }
 
   private void visitWireMethod() {
-    MethodVisitor mv = visitMethod(ACC_PUBLIC, "wire", wireSignature(), null, null);
+    MethodVisitor mv = visitMethod(ACC_PUBLIC, "wire", prybarRuntimeSignature(), null, null);
     mv.visitCode();
 
     Label labelStart = new Label();
@@ -118,7 +165,7 @@ public class WiringAdapter
 
   }
 
-  private String wireSignature() {
+  private String prybarRuntimeSignature() {
     return "(L" + fullPathOfType(PrybarRuntime.class) + ";)V";
   }
 }

@@ -6,8 +6,6 @@ import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.io.PrintWriter;
 import java.io.StringWriter;
-import java.nio.file.Files;
-import java.nio.file.Paths;
 
 import org.junit.Test;
 import org.objectweb.asm.ClassReader;
@@ -17,6 +15,7 @@ import org.objectweb.asm.util.TraceClassVisitor;
 
 import net.stickycode.prybar.discovery.PrybarComponentDefinition;
 import net.stickycode.prybar.discovery.PrybarComponentDependency;
+import net.stickycode.prybar.discovery.PrybarConfiguredField;
 import net.stickycode.prybar.splice.example.ConfiguredComponent;
 import net.stickycode.prybar.splice.example.ConfiguredExample;
 import net.stickycode.prybar.splice.example.ManyFieldComponent;
@@ -52,6 +51,13 @@ public class WiringAdaptorTest {
     check(definition, ManyFieldExample.class);
   }
   
+  @Test
+  public void configured() throws IOException {
+    PrybarComponentDefinition definition = new PrybarComponentDefinition(ConfiguredComponent.class.getName());
+    definition.getConfiguration().add(new PrybarConfiguredField());
+    check(definition, ConfiguredExample.class);
+  }
+
   private void check(PrybarComponentDefinition definition, Class<?> example) throws IOException {
     String targetAsm = spliceClass(definition).replaceAll(".*LineNumber.*\n",        "");
     String exampleAsm = asmifierClass(example).replaceAll("Example", "Component").replaceAll(".*LineNumber.*\n",        "");
@@ -59,8 +65,8 @@ public class WiringAdaptorTest {
   }
 
   private void check(String targetAsm, String exampleAsm, String type) throws IOException {
-    Files.write(Paths.get(type + "-target.txt"), targetAsm.getBytes());
-    Files.write(Paths.get(type + "-example.txt"), exampleAsm.getBytes());
+//    Files.write(Paths.get(type + "-target.txt"), targetAsm.getBytes());
+//    Files.write(Paths.get(type + "-example.txt"), exampleAsm.getBytes());
     assertThat(new ByteArrayInputStream(targetAsm.getBytes())).hasSameContentAs(new ByteArrayInputStream(exampleAsm.getBytes()));
   }
 
