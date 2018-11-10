@@ -1,6 +1,6 @@
 package net.stickycode.prybar.splice;
 
-import static org.assertj.core.api.StrictAssertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThat;
 
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
@@ -17,11 +17,13 @@ import org.objectweb.asm.util.TraceClassVisitor;
 
 import net.stickycode.prybar.discovery.PrybarComponentDefinition;
 import net.stickycode.prybar.discovery.PrybarComponentDependency;
+import net.stickycode.prybar.splice.example.ManyFieldComponent;
+import net.stickycode.prybar.splice.example.ManyFieldExample;
 
 public class WiringAdaptorTest {
 
   @Test
-  public void splice() throws IOException {
+  public void singleField() throws IOException {
     PrybarComponentDefinition definition = new PrybarComponentDefinition(SingleFieldComponent.class.getName());
     definition.getComponentWiring().add(new PrybarComponentDependency()
       .withFieldName("component")
@@ -30,19 +32,34 @@ public class WiringAdaptorTest {
     check(definition, SingleFieldExample.class);
   }
 
-  private void check(PrybarComponentDefinition definition, Class<SingleFieldExample> example) throws IOException {
-    String targetAsm = spliceClass(definition);
-    String exampleAsm = asmifierClass(example).replaceAll("Example", "Component");
-    check(targetAsm, exampleAsm);
+  @Test
+  public void manyField() throws IOException {
+    PrybarComponentDefinition definition = new PrybarComponentDefinition(ManyFieldComponent.class.getName());
+    definition.getComponentWiring()
+      .add(new PrybarComponentDependency()
+        .withFieldName("component")
+        .withFieldType("net/stickycode/prybar/splice/PlaceHolder")
+        .withTarget(PlaceHolder.class))
+      .add(new PrybarComponentDependency()
+        .withFieldName("componentTwo")
+        .withFieldType("net/stickycode/prybar/splice/PlaceHolder")
+        .withTarget(PlaceHolder.class));
+    check(definition, ManyFieldExample.class);
   }
 
-  private void check(String targetAsm, String exampleAsm) throws IOException {
-    Files.write(Paths.get("target.txt"), targetAsm.getBytes());
-    Files.write(Paths.get("example.txt"), exampleAsm.getBytes());
+  private void check(PrybarComponentDefinition definition, Class<?> example) throws IOException {
+    String targetAsm = spliceClass(definition).replaceAll(".*LineNumber.*\n",        "");
+    String exampleAsm = asmifierClass(example).replaceAll("Example", "Component").replaceAll(".*LineNumber.*\n",        "");
+    check(targetAsm, exampleAsm, example.getSimpleName());
+  }
+
+  private void check(String targetAsm, String exampleAsm, String type) throws IOException {
+    Files.write(Paths.get(type + "-target.txt"), targetAsm.getBytes());
+    Files.write(Paths.get(type + "-example.txt"), exampleAsm.getBytes());
     assertThat(new ByteArrayInputStream(targetAsm.getBytes())).hasSameContentAs(new ByteArrayInputStream(exampleAsm.getBytes()));
   }
 
-  private String asmifierClass(Class<SingleFieldExample> type) throws IOException {
+  private String asmifierClass(Class<?> type) throws IOException {
     StringWriter stringWriter = new StringWriter();
     TraceClassVisitor traceClassVisitor = new TraceClassVisitor(null, new ASMifier(), new PrintWriter(stringWriter));
     new ClassReader(type.getName()).accept(traceClassVisitor, 0);

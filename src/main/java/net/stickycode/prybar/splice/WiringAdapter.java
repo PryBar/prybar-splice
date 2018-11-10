@@ -10,6 +10,8 @@ import static org.objectweb.asm.Opcodes.NEW;
 import static org.objectweb.asm.Opcodes.PUTFIELD;
 import static org.objectweb.asm.Opcodes.RETURN;
 
+import java.util.Arrays;
+
 import org.objectweb.asm.ClassVisitor;
 import org.objectweb.asm.ClassWriter;
 import org.objectweb.asm.Label;
@@ -50,10 +52,12 @@ public class WiringAdapter
   }
 
   private String[] concatPrybarComponent(String[] interfaces) {
-    if (interfaces != null)
+    if (interfaces == null)
       return new String[] { fullPathOfType(PrybarComponent.class) };
 
-    return null;
+    String[] newInterfaces = Arrays.copyOf(interfaces, interfaces.length + 1);
+    newInterfaces[interfaces.length] = fullPathOfType(PrybarComponent.class);
+    return newInterfaces;
   }
 
   private String fullPathOfType(Class<?> type) {
@@ -75,20 +79,19 @@ public class WiringAdapter
   private void visitWireMethod() {
     MethodVisitor mv = visitMethod(ACC_PUBLIC, "wire", wireSignature(), null, null);
     mv.visitCode();
-    Label label0 = new Label();
-    mv.visitLabel(label0);
-    mv.visitLineNumber(19, label0);
+
+    Label labelStart = new Label();
+    mv.visitLabel(labelStart);
+    mv.visitLineNumber(0, labelStart);
+
     for (PrybarComponentDependency d : component.getComponentWiring())
       injectDependency(mv, d);
 
-    Label label1 = new Label();
-    mv.visitLabel(label1);
-    mv.visitLineNumber(20, label1);
     mv.visitInsn(RETURN);
-    Label label2 = new Label();
-    mv.visitLabel(label2);
-    mv.visitLocalVariable("this", component.getTypeReference(), null, label0, label2, 0);
-    mv.visitLocalVariable("prybar", "Lnet/stickycode/prybar/pivot/PrybarRuntime;", null, label0, label2, 1);
+    Label labelEnd = new Label();
+    mv.visitLabel(labelEnd);
+    mv.visitLocalVariable("this", component.getTypeReference(), null, labelStart, labelEnd, 0);
+    mv.visitLocalVariable("prybar", "Lnet/stickycode/prybar/pivot/PrybarRuntime;", null, labelStart, labelEnd, 1);
     mv.visitMaxs(7, 2);
     mv.visitEnd();
 
@@ -108,6 +111,10 @@ public class WiringAdapter
       "(Lnet/stickycode/prybar/pivot/PrybarComponentLookup;)Ljava/lang/Object;", true);
     mv.visitTypeInsn(CHECKCAST, d.getFieldTypePath());
     mv.visitFieldInsn(PUTFIELD, component.getTypePath(), d.getFieldName(), d.getFieldTypeReference());
+
+    Label label1 = new Label();
+    mv.visitLabel(label1);
+    mv.visitLineNumber(0, label1);
 
   }
 
